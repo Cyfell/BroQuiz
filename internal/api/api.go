@@ -34,6 +34,7 @@ func (s *API) Init() {
 
 	r.HandleFunc("/infos", InfosHandler).Methods("GET")
 	r.HandleFunc("/answer/{teamID}", s.AnswerHandler).Methods("POST")
+	r.HandleFunc("/clear", s.ClearHandler).Methods("POST")
 
 	s.router = r
 	s.state = logic.NewState()

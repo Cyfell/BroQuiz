@@ -31,6 +31,33 @@
         }
       }
     },
+    "/clear": {
+      "post": {
+        "description": "Request the server to clear the team answerer",
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "Answer"
+        ],
+        "operationId": "ClearRequest",
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "default": {
+            "description": "GenericError",
+            "schema": {
+              "$ref": "#/definitions/GenericError"
+            }
+          }
+        }
+      }
+    },
     "/infos": {
       "get": {
         "description": "Return informations on the server",

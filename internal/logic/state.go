@@ -26,3 +26,10 @@ func (s *State) GetHand(teamNb uint64) bool {
 	s.teamNb = teamNb
 	return true
 }
+
+func (s *State) ClearHand() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	s.teamNb = 0
+}
