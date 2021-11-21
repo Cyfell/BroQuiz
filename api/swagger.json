@@ -1,6 +1,36 @@
 {
   "swagger": "2.0",
   "paths": {
+    "/answer/{teamID}": {
+      "post": {
+        "description": "Request the server for an answer",
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "Answer"
+        ],
+        "operationId": "AnswerRequest",
+        "responses": {
+          "200": {
+            "description": "AnswerResponse",
+            "schema": {
+              "$ref": "#/definitions/AnswerResponse"
+            }
+          },
+          "default": {
+            "description": "GenericError",
+            "schema": {
+              "$ref": "#/definitions/GenericError"
+            }
+          }
+        }
+      }
+    },
     "/infos": {
       "get": {
         "description": "Return informations on the server",
@@ -33,6 +63,26 @@
     }
   },
   "definitions": {
+    "AnswerResponse": {
+      "type": "object",
+      "required": [
+        "TeamNB",
+        "HasHand"
+      ],
+      "properties": {
+        "HasHand": {
+          "description": "Informs if the team has the hand or not",
+          "type": "boolean"
+        },
+        "TeamNB": {
+          "description": "in:body\nThe team number that as attempted an answer",
+          "type": "integer",
+          "format": "uint64"
+        }
+      },
+      "x-go-name": "Response",
+      "x-go-package": "github.com/Cyfell/BroQuiz/pkg/answer"
+    },
     "GenericError": {
       "description": "Generic API error",
       "type": "object",

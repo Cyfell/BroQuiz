@@ -37,6 +37,7 @@ func (suite *APITestSuite) BeforeTest(suiteName, testName string) {
 	)
 
 	if suite.NoError(err) {
+		api.Init()
 		suite.api = api
 	}
 }

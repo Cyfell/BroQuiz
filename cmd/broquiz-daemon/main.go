@@ -21,6 +21,7 @@ func run() int {
 		fmt.Fprintln(os.Stderr, "unable to init API,", err)
 	}
 
+	api.Init()
 	if err := api.Run(); err != nil {
 		fmt.Fprintln(os.Stderr, "error when running history,", err)
 		return 255

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/Cyfell/BroQuiz/internal/logic"
 	"github.com/gorilla/mux"
 )
 
@@ -17,23 +18,25 @@ type Config struct {
 type API struct {
 	router *mux.Router
 	url    string
+	state  *logic.State
 }
 
 func New(ctx context.Context, c Config) (*API, error) {
 	s := &API{
-		router: newRouter(ctx),
-		url:    fmt.Sprintf("%s:%d", c.Host, c.Port),
+		url: fmt.Sprintf("%s:%d", c.Host, c.Port),
 	}
 
 	return s, nil
 }
 
-func newRouter(ctx context.Context) *mux.Router {
+func (s *API) Init() {
 	r := mux.NewRouter()
 
-	r.Handle("/infos", InfosHandler(ctx)).Methods("GET")
+	r.HandleFunc("/infos", InfosHandler).Methods("GET")
+	r.HandleFunc("/answer/{teamID}", s.AnswerHandler).Methods("POST")
 
-	return r
+	s.router = r
+	s.state = logic.NewState()
 }
 
 func (s *API) Run() error {
