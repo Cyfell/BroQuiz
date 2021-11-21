@@ -1,0 +1,17 @@
+version: "3.5"
+
+services:
+    unit-tests:
+        container_name: cyfell-broquiz-tests-unit
+        build:
+            context: ../..
+            dockerfile: tests/docker/Dockerfile
+        image: cyfell-broquiz-tests
+        volumes:
+            - ../..:/code
+        entrypoint: ["sh", "/docker/entrypoint.sh", "."]
+        networks:
+            - broquiz-dev-network 
+
+networks:
+    broquiz-dev-network:

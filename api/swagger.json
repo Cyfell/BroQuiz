@@ -1,0 +1,67 @@
+{
+  "swagger": "2.0",
+  "paths": {
+    "/infos": {
+      "get": {
+        "description": "Return informations on the server",
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "Miscellaneous"
+        ],
+        "operationId": "infos",
+        "responses": {
+          "200": {
+            "description": "Infos",
+            "schema": {
+              "$ref": "#/definitions/Infos"
+            }
+          },
+          "default": {
+            "description": "GenericError",
+            "schema": {
+              "$ref": "#/definitions/GenericError"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "GenericError": {
+      "description": "Generic API error",
+      "type": "object",
+      "required": [
+        "error"
+      ],
+      "properties": {
+        "error": {
+          "description": "in:body\nMessage describing the error",
+          "type": "string",
+          "x-go-name": "Error"
+        }
+      },
+      "x-go-package": "github.com/Cyfell/BroQuiz/pkg/er"
+    },
+    "Infos": {
+      "type": "object",
+      "required": [
+        "time"
+      ],
+      "properties": {
+        "time": {
+          "description": "in:body\nThe response generation time (in UTC)",
+          "type": "string",
+          "format": "date-time",
+          "x-go-name": "Time"
+        }
+      },
+      "x-go-package": "github.com/Cyfell/BroQuiz/pkg/infos"
+    }
+  }
+}

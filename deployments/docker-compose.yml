@@ -1,0 +1,17 @@
+version: "3.5"
+
+services:
+    daemon:
+        build:
+            context: ../
+            dockerfile: build/package/Dockerfile
+        image: broquiz
+        volumes:
+            - ../configs:/etc/broquiz
+        ports:
+            - 8080:8080
+        networks:
+            - broquiz-network
+
+networks:
+    broquiz-network:
