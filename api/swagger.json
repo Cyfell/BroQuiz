@@ -58,6 +58,33 @@
         }
       }
     },
+    "/events": {
+      "get": {
+        "description": "Return a websocket which returns events from the server",
+        "produces": [
+          "application/json"
+        ],
+        "schemes": [
+          "http",
+          "https"
+        ],
+        "tags": [
+          "Events"
+        ],
+        "operationId": "events",
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "default": {
+            "description": "GenericError",
+            "schema": {
+              "$ref": "#/definitions/GenericError"
+            }
+          }
+        }
+      }
+    },
     "/infos": {
       "get": {
         "description": "Return informations on the server",
@@ -104,7 +131,7 @@
         "Team": {
           "description": "in:body\nThe team number that as attempted an answer",
           "type": "integer",
-          "format": "uint64"
+          "format": "int64"
         }
       },
       "x-go-name": "Response",
