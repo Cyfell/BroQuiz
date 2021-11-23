@@ -39,7 +39,7 @@ func (suite *APITestSuite) TestClear() {
 	as.NoError(json.Unmarshal(bodyBytes, &resp))
 
 	expectedResp := answer.Response{
-		TeamNB:  2,
+		Team:    2,
 		HasHand: true,
 	}
 	as.Equal(expectedResp, resp)

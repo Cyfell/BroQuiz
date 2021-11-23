@@ -9,7 +9,7 @@ import (
 )
 
 // AnswerHandler will handle the answer route
-// swagger:route POST /answer/{teamID} Answer AnswerRequest
+// swagger:route POST /answer/{team} Answer AnswerRequest
 //
 // Request the server for an answer
 //
@@ -23,13 +23,13 @@ import (
 // 	200: AnswerResponse
 func (s *API) AnswerHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	teamNB, err := strconv.ParseUint(vars["teamID"], 10, 32)
+	team, err := strconv.Atoi(vars["team"])
 	if err != nil {
 		RespondError(w, http.StatusBadRequest, err)
 	}
 
 	Respond(w, http.StatusOK, answer.Response{
-		TeamNB:  teamNB,
-		HasHand: s.state.GetHand(teamNB),
+		Team:    team,
+		HasHand: s.state.GetHand(team),
 	})
 }

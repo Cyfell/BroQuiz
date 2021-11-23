@@ -33,8 +33,9 @@ func (s *API) Init() {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/infos", InfosHandler).Methods("GET")
-	r.HandleFunc("/answer/{teamID}", s.AnswerHandler).Methods("POST")
+	r.HandleFunc("/answer/{team}", s.AnswerHandler).Methods("POST")
 	r.HandleFunc("/clear", s.ClearHandler).Methods("POST")
+	r.HandleFunc("/events", s.EventsHandler).Methods("GET")
 
 	s.router = r
 	s.state = logic.NewState()

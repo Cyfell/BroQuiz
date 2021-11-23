@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "paths": {
-    "/answer/{teamID}": {
+    "/answer/{team}": {
       "post": {
         "description": "Request the server for an answer",
         "produces": [
@@ -93,7 +93,7 @@
     "AnswerResponse": {
       "type": "object",
       "required": [
-        "TeamNB",
+        "Team",
         "HasHand"
       ],
       "properties": {
@@ -101,7 +101,7 @@
           "description": "Informs if the team has the hand or not",
           "type": "boolean"
         },
-        "TeamNB": {
+        "Team": {
           "description": "in:body\nThe team number that as attempted an answer",
           "type": "integer",
           "format": "uint64"

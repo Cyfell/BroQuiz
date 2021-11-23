@@ -5,7 +5,7 @@ type Response struct {
 	// in:body
 	// The team number that as attempted an answer
 	// Required: true
-	TeamNB uint64
+	Team int
 	// Informs if the team has the hand or not
 	// Required: true
 	HasHand bool
