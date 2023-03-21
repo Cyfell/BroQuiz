@@ -1,11 +1,7 @@
 package api
 
 import (
-	"encoding/json"
-	"io/ioutil"
 	"net/http"
-
-	"github.com/Cyfell/BroQuiz/pkg/answer"
 )
 
 func (suite *APITestSuite) TestAnswer() {
@@ -18,39 +14,14 @@ func (suite *APITestSuite) TestAnswer() {
 	as.NoError(err)
 	response := suite.ExecuteRequest(suite.api.router, req)
 
-	// Then the request is OK
-	as.Equal(http.StatusOK, response.Code)
-
-	bodyBytes, err := ioutil.ReadAll(response.Body)
-	as.NoError(err)
-
-	// And the answer returns the team number and the status with the hand
-	var resp answer.Response
-	as.NoError(json.Unmarshal(bodyBytes, &resp))
-
-	expectedResp := answer.Response{
-		Team:    1,
-		HasHand: true,
-	}
-	as.Equal(expectedResp, resp)
+	// Then the request is created
+	as.Equal(http.StatusCreated, response.Code)
 
 	// When a second answer is triggered by another team
 	req, err = http.NewRequest("POST", "/answer/2", nil)
 	as.NoError(err)
 	response = suite.ExecuteRequest(suite.api.router, req)
 
-	// Then the request is OK
-	as.Equal(http.StatusOK, response.Code)
-
-	bodyBytes, err = ioutil.ReadAll(response.Body)
-	as.NoError(err)
-
-	// And the answer returns the team number and the status without the hand
-	as.NoError(json.Unmarshal(bodyBytes, &resp))
-
-	expectedResp = answer.Response{
-		Team:    2,
-		HasHand: false,
-	}
-	as.Equal(expectedResp, resp)
+	// Then the request is Conflict
+	as.Equal(http.StatusConflict, response.Code)
 }

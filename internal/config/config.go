@@ -16,6 +16,7 @@ func ReadConfig(filename string) (Config, error) {
 	viper.SetConfigType("toml")
 	viper.AddConfigPath("/etc/broquiz/")
 	viper.AddConfigPath("../../configs/")
+	viper.AddConfigPath("./configs/")
 	viper.AddConfigPath(".")
 
 	if err := viper.ReadInConfig(); err != nil {

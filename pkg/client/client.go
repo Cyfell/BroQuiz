@@ -1,14 +1,12 @@
 package client
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
 
-	"github.com/Cyfell/BroQuiz/pkg/answer"
 	"github.com/Cyfell/BroQuiz/pkg/event"
 	"github.com/gorilla/websocket"
 )
@@ -31,17 +29,7 @@ func (c *Client) Answer(team int) (bool, error) {
 	}
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return false, err
-	}
-
-	var answer answer.Response
-	if err := json.Unmarshal(body, &answer); err != nil {
-		return false, err
-	}
-
-	return answer.HasHand, nil
+	return resp.StatusCode == 201, nil
 }
 
 func (c *Client) Clear() error {

@@ -26,7 +26,7 @@ func (suite *APITestSuite) TestEvents() {
 	req, err := http.NewRequest("POST", "/answer/1", nil)
 	as.NoError(err)
 	response := suite.ExecuteRequest(suite.api.router, req)
-	as.Equal(http.StatusOK, response.Code)
+	as.Equal(http.StatusCreated, response.Code)
 
 	// Then we receive the corresponding event
 	evt := event.Event{}
