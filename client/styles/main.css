@@ -1,0 +1,27 @@
+html, body, #app {
+  height: 100%;
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: #030712;
+  color: #f9fafb;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  font: inherit;
+}
+
+input {
+  font: inherit;
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1);    opacity: 0.85; box-shadow: 0 0 0 0   rgb(var(--breathe-color) / 0.55); }
+  50%      { transform: scale(1.12); opacity: 1;    box-shadow: 0 0 0 8px rgb(var(--breathe-color) / 0);    }
+}
+
+.breathe {
+  --breathe-color: 99 102 241;
+  animation: breathe 2.4s ease-in-out infinite;
+}

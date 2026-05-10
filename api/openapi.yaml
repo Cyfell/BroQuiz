@@ -1,0 +1,258 @@
+openapi: 3.1.0
+info:
+  title: BroQuiz API
+  version: 0.1.0
+  description: |
+    HTTP and WebSocket API for the BroQuiz buzzer system. Hardware buzzers POST
+    presses to `/buzzer`; the presenter and audience UIs subscribe to live
+    state via WebSocket on `/events`.
+
+servers:
+  - url: http://{host}:{port}
+    variables:
+      host: { default: localhost }
+      port: { default: '8080' }
+
+tags:
+  - name: buzzer
+  - name: teams
+  - name: round
+  - name: score
+  - name: state
+  - name: admin
+
+paths:
+  /buzzer:
+    post:
+      tags: [buzzer]
+      summary: Hardware buzzer press
+      description: |
+        Sent by a hardware buzzer when its button is pressed. The `id` MUST
+        match a registered team's `id` (buzzer id == team id by design).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BuzzerPress'
+      responses:
+        '200':
+          description: Press accepted as the round's first buzz
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AcceptedResponse' }
+        '409':
+          description: Press rejected (locked, already buzzed, in cooldown, or unknown id)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RejectedResponse' }
+
+  /state:
+    get:
+      tags: [state]
+      summary: Current full game state
+      responses:
+        '200':
+          description: Snapshot
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/GameState' }
+
+  /teams:
+    post:
+      tags: [teams]
+      summary: Create a team
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateTeam' }
+      responses:
+        '201': { description: Created }
+        '409': { description: Conflict (id already exists) }
+
+  /teams/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema: { type: integer }
+    patch:
+      tags: [teams]
+      summary: Rename or recolor a team
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpdateTeam' }
+      responses:
+        '200': { description: Updated }
+        '404': { description: Not found }
+    delete:
+      tags: [teams]
+      summary: Remove a team
+      responses:
+        '200': { description: Removed }
+
+  /round/validate:
+    post:
+      tags: [round]
+      summary: Mark the active buzz correct (+1, snapshot, clear, unlock)
+      responses:
+        '200': { description: Validated }
+        '400': { description: No active buzz }
+
+  /round/discard:
+    post:
+      tags: [round]
+      summary: Mark the active buzz wrong (cooldown the team, clear current buzz)
+      responses:
+        '200': { description: Discarded }
+        '400': { description: No active buzz }
+
+  /round/lock:
+    post:
+      tags: [round]
+      summary: Globally lock buzzers (presses rejected)
+      responses:
+        '200': { description: Locked }
+
+  /round/unlock:
+    post:
+      tags: [round]
+      summary: Globally unlock buzzers
+      responses:
+        '200': { description: Unlocked }
+
+  /round/cooldown:
+    post:
+      tags: [round]
+      summary: Configure the wrong-answer cooldown duration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [cooldownMs]
+              properties:
+                cooldownMs: { type: integer, minimum: 0 }
+      responses:
+        '200': { description: Updated }
+
+  /score:
+    post:
+      tags: [score]
+      summary: Manually adjust a team's score
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ScoreAdjust' }
+      responses:
+        '200': { description: Adjusted }
+        '404': { description: Team not found }
+
+  /reset:
+    post:
+      tags: [admin]
+      summary: Wipe all teams, scores, and round state
+      responses:
+        '200': { description: Reset }
+
+  /events:
+    get:
+      tags: [state]
+      summary: WebSocket — live state updates
+      description: |
+        Upgrade to a WebSocket. The server immediately sends a `state` message,
+        then a `state` message on every mutation, and a `buzz` message each
+        time a press is accepted.
+        Message envelope:
+          - `{ "type": "state", "state": GameState }`
+          - `{ "type": "buzz",  "buzz":  { "teamId": int, "at": epochMs } }`
+      responses:
+        '101': { description: Switching Protocols (WebSocket) }
+
+components:
+  schemas:
+    BuzzerPress:
+      type: object
+      required: [id]
+      properties:
+        id: { type: integer, description: Buzzer / team id }
+
+    AcceptedResponse:
+      type: object
+      properties:
+        accepted: { type: boolean, enum: [true] }
+
+    RejectedResponse:
+      type: object
+      properties:
+        accepted: { type: boolean, enum: [false] }
+        reason:
+          type: string
+          enum: [locked, already_buzzed, cooldown, unknown_team]
+
+    Team:
+      type: object
+      required: [id, name, color]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        color: { type: string, description: Hex color }
+
+    CreateTeam:
+      type: object
+      required: [id, name]
+      properties:
+        id: { type: integer }
+        name: { type: string, minLength: 1 }
+        color: { type: string }
+
+    UpdateTeam:
+      type: object
+      properties:
+        name: { type: string }
+        color: { type: string }
+
+    Buzz:
+      type: object
+      required: [teamId, at]
+      properties:
+        teamId: { type: integer }
+        at: { type: integer, description: Unix ms timestamp }
+
+    GameState:
+      type: object
+      required: [teams, scores, currentBuzz, cooldowns, locked, config]
+      properties:
+        teams:
+          type: array
+          items: { $ref: '#/components/schemas/Team' }
+        scores:
+          type: object
+          additionalProperties: { type: integer }
+          description: Map of team id → score
+        currentBuzz:
+          oneOf:
+            - { $ref: '#/components/schemas/Buzz' }
+            - { type: 'null' }
+        cooldowns:
+          type: object
+          additionalProperties: { type: integer }
+          description: Map of team id → cooldown deadline (unix ms)
+        locked: { type: boolean }
+        config:
+          type: object
+          required: [cooldownMs]
+          properties:
+            cooldownMs: { type: integer }
+
+    ScoreAdjust:
+      type: object
+      required: [teamId, delta]
+      properties:
+        teamId: { type: integer }
+        delta: { type: integer }

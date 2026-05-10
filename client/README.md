@@ -1,3 +1,0 @@
-# BroQuiz Client
-
-TODO
